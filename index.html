@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Great Teddy Adventure 🧸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+            background: #f0f4ff;
+            overflow-x: hidden;
+            touch-action: pan-y;
+        }
+
+        .story-container {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scene {
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .scene.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .character {
+            font-size: 8em;
+            margin: 30px 0;
+            animation: bounce 1s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .text {
+            font-size: 1.4em;
+            color: #333;
+            margin: 20px 0;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .choice-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.2em;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .choice-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .choice-btn:active {
+            transform: scale(0.95);
+        }
+
+        .emoji-rain {
+            position: absolute;
+            font-size: 2em;
+            animation: fall 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-20px) rotate(-5deg); }
+            75% { transform: translateX(20px) rotate(5deg); }
+        }
+
+        .spin {
+            animation: spin 1s ease-in-out;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.5); }
+            to { transform: rotate(360deg) scale(1); }
+        }
+
+        .wiggle {
+            animation: wiggle 0.5s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .scene-bg-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .scene-bg-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .scene-bg-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .scene-bg-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+        .scene-bg-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+        .scene-bg-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; }
+        .scene-bg-7 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .scene-bg-8 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+
+        .tap-indicator {
+            font-size: 1.2em;
+            margin-top: 20px;
+            opacity: 0.8;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+
+        .final-message {
+            background: white;
+            color: #ff6b9d;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            font-size: 1.3em;
+            line-height: 1.8;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff6b9d;
+            animation: confettiFall 3s linear infinite;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .thought-bubble {
+            background: white;
+            color: #333;
+            padding: 15px 25px;
+            border-radius: 20px;
+            position: relative;
+            margin: 20px 0;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid white;
+        }
+
+        .multiple-chars {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            font-size: 6em;
+            margin: 30px 0;
+        }
+
+        .char-1 { animation: bounce 1s ease-in-out infinite; }
+        .char-2 { animation: bounce 1s ease-in-out infinite 0.2s; }
+        .char-3 { animation: bounce 1s ease-in-out infinite 0.4s; }
+
+        @media (max-width: 480px) {
+            .character {
+                font-size: 6em;
+            }
+            
+            .text {
+                font-size: 1.2em;
+            }
+            
+            .choice-btn {
+                font-size: 1.1em;
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="story-container">
+        <!-- Scene 1: Start -->
+        <div class="scene active scene-bg-1" id="scene1">
+            <div class="character">🧸</div>
+            <div class="text">Once upon a time...<br>A teddy was chilling on a shelf</div>
+            <div class="tap-indicator">👇 Tap to continue</div>
+        </div>
+
+        <!-- Scene 2: Boring -->
+        <div class="scene scene-bg-2" id="scene2">
+            <div class="character wiggle">🧸</div>
+            <div class="thought-bubble">"This is SO boring!"</div>
+            <div class="text">Teddy was tired of sitting around<br>doing nothing...</div>
+        </div>
+
+        <!-- Scene 3: Idea -->
+        <div class="scene scene-bg-3" id="scene3">
+            <div class="character">🧸💡</div>
+            <div class="text">Suddenly... an idea!</div>
+            <div class="thought-bubble">"I should go on an ADVENTURE!"</div>
+        </div>
+
+        <!-- Scene 4: Choice -->
+        <div class="scene scene-bg-4" id="scene4">
+            <div class="character">🧸</div>
+            <div class="text">Where should Teddy go first?</div>
+            <div class="choice-container">
+                <button class="choice-btn" onclick="goToScene(5, 'space')">🚀 Outer Space!</button>
+                <button class="choice-btn" onclick="goToScene(5, 'ocean')">🌊 Deep Ocean!</button>
+                <button class="choice-btn" onclick="goToScene(5, 'jungle')">🌴 Wild Jungle!</button>
+            </div>
+        </div>
+
+        <!-- Scene 5: Adventures -->
+        <div class="scene scene-bg-5" id="scene5">
+            <div class="multiple-chars">
+                <span class="char-1">🧸</span>
+                <span class="char-2" id="adventure-icon">🚀</span>
+            </div>
+            <div class="text" id="adventure-text">Wheeeee!</div>
+        </div>
+
+        <!-- Scene 6: Problem -->
+        <div class="scene scene-bg-6" id="scene6">
+            <div class="character shake">🧸</div>
+            <div class="text" id="problem-text">Oh no!</div>
+            <div class="thought-bubble" id="problem-thought">Houston, we have a problem!</div>
+        </div>
+
+        <!-- Scene 7: Solution -->
+        <div class="scene scene-bg-7" id="scene7">
+            <div class="character spin">🧸</div>
+            <div class="text">Wait... Teddy had an idea!</div>
+            <div class="choice-container">
+                <button class="choice-btn" onclick="goToScene(8, 'dance')">💃 Dance it away!</button>
+                <button class="choice-btn" onclick="goToScene(8, 'sing')">🎤 Sing a song!</button>
+                <button class="choice-btn" onclick="goToScene(8, 'magic')">✨ Use magic!</button>
+            </div>
+        </div>
+
+        <!-- Scene 8: Success -->
+        <div class="scene scene-bg-8" id="scene8">
+            <div class="multiple-chars" id="success-chars">
+                <span class="char-1">🧸</span>
+                <span class="char-2">✨</span>
+                <span class="char-3">🎉</span>
+            </div>
+            <div class="text" id="success-text">It worked! Teddy is amazing!</div>
+        </div>
+
+        <!-- Scene 9: Tired -->
+        <div class="scene scene-bg-1" id="scene9">
+            <div class="character">🧸😴</div>
+            <div class="text">After all that adventure...<br>Teddy was super tired</div>
+            <div class="thought-bubble">"I need a cozy home..."</div>
+        </div>
+
+        <!-- Scene 10: Final -->
+        <div class="scene scene-bg-7" id="scene10">
+            <div class="character">🧸💕</div>
+            <div class="text" style="font-size: 2em; color: #ff6b9d;">And that's when Teddy found...</div>
+        </div>
+
+        <!-- Scene 11: YOU -->
+        <div class="scene scene-bg-2" id="scene11">
+            <div class="character">🧸🏡</div>
+            <div class="final-message">
+                <strong>YOU!</strong><br><br>
+                The perfect home for a silly, adventurous teddy! 🎉<br><br>
+                Happy Teddy Day! 💝
+            </div>
+            <div class="text" style="font-size: 1.1em; margin-top: 20px;">
+                P.S. - You're basically a teddy's dream come true! 🌟
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScene = 1;
+        let userChoices = {
+            adventure: '',
+            solution: ''
+        };
+
+        // Add click to advance for non-choice scenes
+        document.querySelectorAll('.scene').forEach((scene, index) => {
+            if (!scene.querySelector('.choice-container')) {
+                scene.addEventListener('click', () => {
+                    if (scene.classList.contains('active')) {
+                        nextScene();
+                    }
+                });
+            }
+        });
+
+        function nextScene() {
+            const current = document.getElementById(`scene${currentScene}`);
+            current.classList.remove('active');
+            
+            currentScene++;
+            
+            const next = document.getElementById(`scene${currentScene}`);
+            if (next) {
+                next.classList.add('active');
+                
+                // Special effects for certain scenes
+                if (currentScene === 11) {
+                    createConfetti();
+                    createEmojiRain(['🧸', '💕', '✨', '🎉']);
+                }
+            }
+        }
+
+        function goToScene(sceneNum, choice) {
+            // Store user choice
+            if (sceneNum === 5) {
+                userChoices.adventure = choice;
+                setupAdventure(choice);
+            } else if (sceneNum === 8) {
+                userChoices.solution = choice;
+                setupSuccess(choice);
+            }
+            
+            const current = document.getElementById(`scene${currentScene}`);
+            current.classList.remove('active');
+            
+            currentScene = sceneNum;
+            
+            const next = document.getElementById(`scene${currentScene}`);
+            next.classList.add('active');
+        }
+
+        function setupAdventure(type) {
+            const adventures = {
+                space: {
+                    icon: '🚀',
+                    text: 'Teddy zoomed through the stars!',
+                    problem: 'The rocket ran out of fuel! 😱',
+                    thought: 'How do I get back home?!'
+                },
+                ocean: {
+                    icon: '🌊',
+                    text: 'Teddy dove deep into the ocean!',
+                    problem: 'Teddy met a grumpy octopus! 🐙',
+                    thought: 'This octopus looks hangry!'
+                },
+                jungle: {
+                    icon: '🌴',
+                    text: 'Teddy swung through the jungle!',
+                    problem: 'Teddy got lost in the vines! 🌿',
+                    thought: 'Which way is out?!'
+                }
+            };
+
+            const adv = adventures[type];
+            document.getElementById('adventure-icon').textContent = adv.icon;
+            document.getElementById('adventure-text').textContent = adv.text;
+            document.getElementById('problem-text').textContent = adv.problem;
+            document.getElementById('problem-thought').textContent = adv.thought;
+
+            createEmojiRain([adv.icon, '✨', '⭐']);
+        }
+
+        function setupSuccess(type) {
+            const solutions = {
+                dance: {
+                    chars: ['🧸', '💃', '🕺'],
+                    text: 'Teddy danced so hard, everything became awesome!'
+                },
+                sing: {
+                    chars: ['🧸', '🎤', '🎵'],
+                    text: 'Teddy sang the most ridiculous song ever!'
+                },
+                magic: {
+                    chars: ['🧸', '✨', '🪄'],
+                    text: 'Teddy waved a magical wand and POOF!'
+                }
+            };
+
+            const sol = solutions[type];
+            const container = document.getElementById('success-chars');
+            container.innerHTML = sol.chars.map((char, i) => 
+                `<span class="char-${i+1}">${char}</span>`
+            ).join('');
+            document.getElementById('success-text').textContent = sol.text;
+
+            createEmojiRain(sol.chars);
+        }
+
+        function createEmojiRain(emojis) {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const emoji = document.createElement('div');
+                    emoji.className = 'emoji-rain';
+                    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    emoji.style.left = Math.random() * 100 + '%';
+                    emoji.style.animationDelay = Math.random() * 2 + 's';
+                    emoji.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.querySelector('.story-container').appendChild(emoji);
+                    
+                    setTimeout(() => emoji.remove(), 4000);
+                }, i * 200);
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b9d', '#667eea', '#764ba2', '#f5576c', '#4facfe'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        // Preload scenes for smooth transitions
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.style.willChange = 'transform, opacity';
+            });
+        });
+    </script>
+</body>
+</html>
